@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/pajicf/stanalizator/cmd/keeper"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -22,12 +23,13 @@ func NewRootCommand() RootCommand {
 	}
 }
 
-func (rc *RootCommand) initRootCommand() {
-	return
+func (rc *RootCommand) initSubcommands() {
+	keeperCmd := keeper.NewCommand()
+	rc.cmd.AddCommand(&keeperCmd)
 }
 
 func (rc *RootCommand) Execute() {
-	rc.initRootCommand()
+	rc.initSubcommands()
 	err := rc.cmd.Execute()
 
 	if err != nil {
