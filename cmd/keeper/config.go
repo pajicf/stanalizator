@@ -3,6 +3,8 @@ package keeper
 import (
 	"bytes"
 	"github.com/pajicf/stanalizator/configs"
+	keepercore "github.com/pajicf/stanalizator/internal/keeper"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -16,14 +18,22 @@ type BuildConfig struct {
 	haloApiURL         string
 }
 
-func ParseBuildConfig() BuildConfig {
+type CommandArgs struct {
+	geoConfigPath string
+	toMail        string
+}
+
+func parseBuildConfig() BuildConfig {
 	data, err := configs.Embedded.ReadFile("keeper/config.toml")
 	if err != nil {
 		panic(err)
 	}
 
 	viper.SetConfigType("toml")
-	viper.ReadConfig(bytes.NewReader(data))
+	err = viper.ReadConfig(bytes.NewReader(data))
+	if err != nil {
+		panic(err)
+	}
 
 	refreshRate := viper.GetInt("cron.refresh_rate_minutes")
 	emailJSApiUrl := viper.GetString("emailjs.api_url")
@@ -41,5 +51,34 @@ func ParseBuildConfig() BuildConfig {
 		emailJSTemplateID,
 		emailJSAccessToken,
 		haloApiURL,
+	}
+}
+
+func parseCommandArgs(cmd *cobra.Command) CommandArgs {
+	geoConfigPath, err := cmd.Flags().GetString(FlagNameGeoConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	toMail, err := cmd.Flags().GetString(FlagNameToMail)
+	if err != nil {
+		panic(err)
+	}
+
+	return CommandArgs{
+		geoConfigPath: geoConfigPath,
+		toMail:        toMail,
+	}
+}
+
+func generateKeeperConfig(bc *BuildConfig, cmdArgs *CommandArgs) keepercore.Config {
+	return keepercore.Config{
+		GeoConfigPath:      cmdArgs.geoConfigPath,
+		ToMail:             cmdArgs.toMail,
+		EmailJSUserID:      bc.emailJSUserID,
+		EmailJSServiceID:   bc.emailJSServiceID,
+		EmailJSTemplateID:  bc.emailJSTemplateID,
+		EmailJSAccessToken: bc.emailJSAccessToken,
+		HaloApiURL:         bc.haloApiURL,
 	}
 }
