@@ -2,10 +2,13 @@ package keeper
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"github.com/pajicf/stanalizator/configs"
 	keepercore "github.com/pajicf/stanalizator/internal/keeper"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 )
 
 type BuildConfig struct {
@@ -24,7 +27,7 @@ type CommandArgs struct {
 }
 
 func parseBuildConfig() BuildConfig {
-	data, err := configs.Embedded.ReadFile("keeper/config.toml")
+	data, err := configs.EmbeddedTomlConfigs.ReadFile("keeper/config.toml")
 	if err != nil {
 		panic(err)
 	}
@@ -71,9 +74,30 @@ func parseCommandArgs(cmd *cobra.Command) CommandArgs {
 	}
 }
 
+func parseGeoConfigFromPath(path string) keepercore.GeoConfig {
+	content, err := os.ReadFile(path)
+
+	if err != nil {
+		fmt.Errorf("error reading file with path %s", path)
+		panic(err)
+	}
+
+	var payload keepercore.GeoConfig
+	err = json.Unmarshal(content, &payload)
+
+	if err != nil {
+		fmt.Errorf("error during unmarshaling")
+		panic(err)
+	}
+
+	return payload
+}
+
 func generateKeeperConfig(bc *BuildConfig, cmdArgs *CommandArgs) keepercore.Config {
+	gc := parseGeoConfigFromPath(cmdArgs.geoConfigPath)
+
 	return keepercore.Config{
-		GeoConfigPath:      cmdArgs.geoConfigPath,
+		GeoConfig:          gc,
 		ToMail:             cmdArgs.toMail,
 		EmailJSUserID:      bc.emailJSUserID,
 		EmailJSServiceID:   bc.emailJSServiceID,
