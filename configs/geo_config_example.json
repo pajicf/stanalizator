@@ -1,0 +1,14 @@
+[
+  {
+    "minPrice": 100,
+    "maxPrice": 1000,
+    "type": 0,
+    "geoPolygonString": ""
+  },
+  {
+    "minPrice": 50000,
+    "maxPrice": 150000,
+    "type": 1,
+    "geoPolygonString": ""
+  }
+]
