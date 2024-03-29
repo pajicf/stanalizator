@@ -13,10 +13,8 @@ import (
 
 type BuildConfig struct {
 	refreshRate        int
-	emailJSApiURL      string
 	emailJSUserID      string
 	emailJSServiceID   string
-	emailJSTemplateID  string
 	emailJSAccessToken string
 	haloApiURL         string
 }
@@ -39,19 +37,15 @@ func parseBuildConfig() BuildConfig {
 	}
 
 	refreshRate := viper.GetInt("cron.refresh_rate_minutes")
-	emailJSApiUrl := viper.GetString("emailjs.api_url")
 	emailJSUserID := viper.GetString("emailjs.user_id")
 	emailJSServiceID := viper.GetString("emailjs.service_id")
-	emailJSTemplateID := viper.GetString("emailjs.template_id")
 	emailJSAccessToken := viper.GetString("emailjs.access_token")
 	haloApiURL := viper.GetString("halo.api_url")
 
 	return BuildConfig{
 		refreshRate,
-		emailJSApiUrl,
 		emailJSUserID,
 		emailJSServiceID,
-		emailJSTemplateID,
 		emailJSAccessToken,
 		haloApiURL,
 	}
@@ -97,12 +91,10 @@ func generateKeeperConfig(bc *BuildConfig, cmdArgs *CommandArgs) keepercore.Conf
 	gc := parseGeoConfigFromPath(cmdArgs.geoConfigPath)
 
 	return keepercore.Config{
-		GeoConfig:          gc,
-		ToMail:             cmdArgs.toMail,
-		EmailJSUserID:      bc.emailJSUserID,
-		EmailJSServiceID:   bc.emailJSServiceID,
-		EmailJSTemplateID:  bc.emailJSTemplateID,
-		EmailJSAccessToken: bc.emailJSAccessToken,
-		HaloApiURL:         bc.haloApiURL,
+		GeoConfig:        gc,
+		ToMail:           cmdArgs.toMail,
+		EmailJSUserID:    bc.emailJSUserID,
+		EmailJSServiceID: bc.emailJSServiceID,
+		HaloApiURL:       bc.haloApiURL,
 	}
 }
