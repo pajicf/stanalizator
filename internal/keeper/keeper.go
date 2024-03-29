@@ -21,5 +21,6 @@ func (k *Keeper) Run() {
 	fmt.Printf("Args config test: %s \n", k.cfg.ToMail)
 	fmt.Printf("Geo Config item 0, type: %d & type api value %s \n", k.cfg.GeoConfig[0].Type, k.cfg.GeoConfig[0].Type.ApiValue())
 
-	_ = emailjs.NewEmailJS(k.cfg.EmailJSUserID, k.cfg.EmailJSServiceID)
+	ejs := emailjs.NewEmailJS(k.cfg.EmailJSUserID, k.cfg.EmailJSServiceID)
+	emailjs.SendStanalizatorTemplate(&ejs, k.cfg.ToMail, "Test")
 }
